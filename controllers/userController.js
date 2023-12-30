@@ -134,6 +134,19 @@ class userController {
       console.log("Error while changing password:", error);
     }
   };
+
+  static fetchProfile = async (req, res) => {
+    try {
+      const userData = req.user;
+      res.status(200).send({
+        status: "Success",
+        msg: "Profile Fetched successfully",
+        data: req.user
+      })
+    } catch (error) {
+      console.log("Error while fetching profile of user: ", error)
+    }
+  }
 }
 
 export default userController;
