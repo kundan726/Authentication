@@ -26,23 +26,27 @@ class userController {
               tc: tc,
             };
             await authModel.create(userData);
-            const userSavedData = await authModel.findOne({email});
-            const token = jwt.sign({userID : userSavedData._id},process.env.SECRET_KEY,{expiresIn: '5d'});
+            const userSavedData = await authModel.findOne({ email });
+            const token = jwt.sign(
+              { userID: userSavedData._id },
+              process.env.SECRET_KEY,
+              { expiresIn: "5d" }
+            );
             res.status(200).send({
-              'status': "Success",
-              'msg': "Data Saved Successfully",
-              'token': token
+              status: "Success",
+              msg: "Data Saved Successfully",
+              token: token,
             });
           } else {
             res.status(400).send({
-              'status': "Failure",
-              'msg': "Password and confirm password doesn't match.",
+              status: "Failure",
+              msg: "Password and confirm password doesn't match.",
             });
           }
         } else {
           res.status(400).send({
-            'status': "Failure",
-            'msg': "Please fill all the details",
+            status: "Failure",
+            msg: "Please fill all the details",
           });
         }
       } catch (error) {
@@ -57,40 +61,77 @@ class userController {
       if (email && password) {
         const user = await authModel.findOne({ email });
         if (user !== null) {
-          const passwordMatched = await bcrypt.compare(
-            password,
-            user.password
-          );
-          console.log("passwordMatched",passwordMatched);
-          // process.exit(0)
-          if ((email === user.email) && passwordMatched) {
-            const userSavedData = await authModel.findOne({email});
-            const token = jwt.sign({userID : userSavedData._id},process.env.SECRET_KEY,{expiresIn: '5d'});
+          const passwordMatched = await bcrypt.compare(password, user.password);
+          console.log("passwordMatched", passwordMatched);
+          if (email === user.email && passwordMatched) {
+            const userSavedData = await authModel.findOne({ email });
+            const token = jwt.sign(
+              { userID: userSavedData._id },
+              process.env.SECRET_KEY,
+              { expiresIn: "5d" }
+            );
             res.status(200).send({
-              'status': "Success",
-              'msg': "Login Successful",
-              'token': token
+              status: "Success",
+              msg: "Login Successful",
+              token: token,
             });
           } else {
             res.status(400).send({
-              'status': "Failure",
-              'msg': "Credentials not matched",
+              status: "Failure",
+              msg: "Credentials not matched",
             });
           }
-        }else {
-        res.status(400).send({
-          'status': "Failure",
-          'msg': "User Not Found!",
-        });
-      }
+        } else {
+          res.status(400).send({
+            status: "Failure",
+            msg: "User Not Found!",
+          });
+        }
       } else {
         res.status(400).send({
-          'status': "Failure",
-          'msg': "Please provide all the required field.",
+          status: "Failure",
+          msg: "Please provide all the required field.",
         });
       }
     } catch (error) {
       console.log("Error While Login :", error);
+    }
+  };
+
+  static userChangePassword = async (req, res) => {
+    try {
+      const { password, confirm_password } = req.body;
+      console.log("req.user", req.user);
+      if (password && confirm_password) {
+        if (password === confirm_password) {
+          const salt = await bcrypt.genSalt(12);
+          const newHashPassword = await bcrypt.hash(password, salt);
+          console.log("newHashPAssword", newHashPassword);
+          const findQuery = {
+            email: req.user.email,
+          };
+          const updateQuery = {
+            password: newHashPassword,
+          };
+          await authModel.findOneAndUpdate(findQuery, updateQuery);
+          res.status(200).send({
+            status: "Success",
+            msg: "Password Changed Successfully",
+          });
+        } else {
+          res.status(400).send({
+            status: "Failure",
+            msg: "Password and confirm password does not match!",
+          });
+        }
+      } else {
+        res.status(400).send({
+          status: "Failure",
+          msg: "Please Provide all the details",
+        });
+      }
+    } catch (error) {
+      console.log("Error while changing password:", error);
     }
   };
 }

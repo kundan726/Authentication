@@ -1,13 +1,16 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
-import userController from '../controllers/userController.js';
+import userController from "../controllers/userController.js";
+import authenticUser from "../middleware/userAuthMiddleware.js";
+
+// authenticating
+router.post("/changePassword", authenticUser);
 
 //Public Route
-console.log("44444444444444")
-router.post('/register', userController.userRegistration);
-router.post('/login', userController.userLogin)
-
+router.post("/register", userController.userRegistration);
+router.post("/login", userController.userLogin);
 
 //Protected Route
+router.post("/changePassword", userController.userChangePassword);
 
 export default router;
