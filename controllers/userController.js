@@ -73,20 +73,20 @@ class userController {
             });
           } else {
             res.status(400).send({
-              status: "Failure",
-              msg: "Credentials not matched",
+              'status': "Failure",
+              'msg': "Credentials not matched",
             });
           }
         }else {
         res.status(400).send({
-          status: "Failure",
-          msg: "User Not Found!",
+          'status': "Failure",
+          'msg': "User Not Found!",
         });
       }
       } else {
         res.status(400).send({
-          status: "Failure",
-          msg: "Please provide all the required field.",
+          'status': "Failure",
+          'msg': "Please provide all the required field.",
         });
       }
     } catch (error) {
